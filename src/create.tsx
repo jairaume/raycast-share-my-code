@@ -1,11 +1,12 @@
-import { Action, ActionPanel, Form, Toast, showToast, Clipboard, LaunchProps, Icon } from "@raycast/api";
+import { Action, ActionPanel, Form, Toast, showToast, Clipboard, LaunchProps, Icon, useNavigation } from "@raycast/api";
 import { FormValidation, useForm, useFetch } from "@raycast/utils";
 import { useEffect, useState } from "react";
 import got from "got";
 import { baseURL, characters, MIN_SLUG_SIZE, RAND_SLUG_SIZE, smcUrl } from "./Constants";
 import useStoredRecents from "./hooks/useStoredRecents";
 import flourite from "flourite";
-import ViewCodeAction from "./components/ViewCodeAction";
+import CodeView from "./components/CodeView";
+import useParser from "./hooks/useParser";
 
 type CodeChekResponse = {
   timestamp: number;
@@ -23,11 +24,13 @@ interface LaunchPropsType {
 
 export default function CreateCommand(props: LaunchProps<{arguments: LaunchPropsType} >) {  
   const { slug } = props.arguments;
+
   const [randomSlug, setRandomSlug] = useState<string>("")
   const [newSlug, setNewSlug] = useState<string>(slug  || "")
   const [autoSlug, setAutoSlug] = useState<boolean>(!slug);
-  const [submitted, setSubmitted] = useState<boolean>(false);
+  
   const { addRecent } = useStoredRecents();
+  const { push } = useNavigation();
 
   const { handleSubmit, itemProps, values, setValue, setValidationError } = useForm<SMCFormValues>({
     async onSubmit(values: SMCFormValues) {
@@ -60,7 +63,7 @@ export default function CreateCommand(props: LaunchProps<{arguments: LaunchProps
           language: flourite(values.content).language
         };
         addRecent(newStoredRecent);
-        setSubmitted(true);
+        push(<CodeView code={{code: values.content, parsedCode: parsedData}} slug={values.slug} isLoading={false} />);
       } 
       catch (error) {
         toast.style = Toast.Style.Failure;
@@ -73,6 +76,8 @@ export default function CreateCommand(props: LaunchProps<{arguments: LaunchProps
       content: FormValidation.Required
     },
   });
+
+  const parsedData = useParser(values.content || "")
   
   const { data, isLoading } = useFetch<CodeChekResponse>(
     `${baseURL}/code_check.php?slug=${newSlug}`, 
@@ -135,19 +140,9 @@ export default function CreateCommand(props: LaunchProps<{arguments: LaunchProps
         />
       }
       actions={
-        submitted ? 
-          <ActionPanel>
-              <ViewCodeAction slug={values.slug} />
-              <Action.OpenInBrowser 
-                title="Open in Browser" 
-                url={smcUrl+"/"+values.slug} 
-                shortcut={{ modifiers: ["cmd"], key: "b" }}
-              />
-          </ActionPanel>
-          :
-          <ActionPanel>
-              <Action.SubmitForm title="Submit" onSubmit={handleSubmit} icon={Icon.Upload} />
-          </ActionPanel>
+        <ActionPanel>
+            <Action.SubmitForm title="Submit" onSubmit={handleSubmit} icon={Icon.Upload} />
+        </ActionPanel>
       }
     >
       <Form.Checkbox 

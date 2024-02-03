@@ -3,6 +3,7 @@ import flourite, { DetectedLanguage } from 'flourite';
 import { useEffect, useState } from "react";
 import useStoredRecents from "../hooks/useStoredRecents";
 import CreateCodeAction from "./CreateCodeAction";
+import { smcUrl } from "../Constants";
 
 export default function CodeView(props: {code: {code:string, parsedCode:string}, slug: string, isLoading: boolean}) {
     const { code : {code, parsedCode}, isLoading, slug } = props;
@@ -31,14 +32,25 @@ export default function CodeView(props: {code: {code:string, parsedCode:string},
                             <ActionPanel.Section>
 
                                 <Action.CopyToClipboard 
-                                    title="Copy Code" 
+                                    title="Copy Content" 
                                     content={code}
-                                    />
+                                />
                                 <Action.OpenInBrowser 
                                     title="Open in Browser" 
-                                    url={`https://sharemycode.fr/${slug}`} 
-                                    shortcut={{ modifiers: ["cmd"], key: "b" }}
-                                    />
+                                    url={`${smcUrl}/${slug}`} 
+                                />
+                                <Action.CopyToClipboard
+                                    title="Copy Link"
+                                    icon={Icon.Link}
+                                    content={`${smcUrl}/${slug}`}
+                                    shortcut={{ modifiers: ["cmd"], key: "l" }}
+                                />
+                                <Action.CopyToClipboard
+                                    title="Copy Slug"
+                                    icon={Icon.Lowercase}
+                                    content={slug}
+                                    shortcut={{ modifiers: ["cmd"], key: "s" }}
+                                />
                             </ActionPanel.Section>
                             <ActionPanel.Section title="Other">
                                 {
