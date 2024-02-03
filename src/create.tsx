@@ -11,7 +11,7 @@ import useParser from "./hooks/useParser";
 type CodeChekResponse = {
   timestamp: number;
   size: number;
-}
+};
 
 interface SMCFormValues {
   slug: string;
@@ -22,13 +22,13 @@ interface LaunchPropsType {
   slug: string;
 }
 
-export default function CreateCommand(props: LaunchProps<{arguments: LaunchPropsType} >) {  
+export default function CreateCommand(props: LaunchProps<{ arguments: LaunchPropsType }>) {
   const { slug } = props.arguments;
 
-  const [randomSlug, setRandomSlug] = useState<string>("")
-  const [newSlug, setNewSlug] = useState<string>(slug  || "")
+  const [randomSlug, setRandomSlug] = useState<string>("");
+  const [newSlug, setNewSlug] = useState<string>(slug || "");
   const [autoSlug, setAutoSlug] = useState<boolean>(!slug);
-  
+
   const { addRecent } = useStoredRecents();
   const { push } = useNavigation();
 
@@ -44,28 +44,27 @@ export default function CreateCommand(props: LaunchProps<{arguments: LaunchProps
 
       try {
         await got.post(`${baseURL}/code_update.php`, {
-          body: formData.toString() ,
+          body: formData.toString(),
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
         });
-  
-        await Clipboard.copy(smcUrl+"/"+values.slug);
-  
+
+        await Clipboard.copy(smcUrl + "/" + values.slug);
+
         toast.style = Toast.Style.Success;
         toast.title = "Shared code!";
         toast.message = `Copied ${smcUrl}/${values.slug} to your clipboard`;
 
         const newStoredRecent = {
-          slug: values.slug, 
-          content: values.content, 
-          date: new Date(), 
-          language: flourite(values.content).language
+          slug: values.slug,
+          content: values.content,
+          date: new Date(),
+          language: flourite(values.content).language,
         };
         addRecent(newStoredRecent);
-        push(<CodeView code={{code: values.content, parsedCode: parsedData}} slug={values.slug} isLoading={false} />);
-      } 
-      catch (error) {
+        push(<CodeView code={{ code: values.content, parsedCode: parsedData }} slug={values.slug} isLoading={false} />);
+      } catch (error) {
         toast.style = Toast.Style.Failure;
         toast.title = "Failed sharing code";
         toast.message = "There seems to be a problem with the server. Please try again later.";
@@ -73,97 +72,88 @@ export default function CreateCommand(props: LaunchProps<{arguments: LaunchProps
     },
     validation: {
       slug: FormValidation.Required,
-      content: FormValidation.Required
+      content: FormValidation.Required,
     },
   });
 
-  const parsedData = useParser(values.content || "")
-  
-  const { data, isLoading } = useFetch<CodeChekResponse>(
-    `${baseURL}/code_check.php?slug=${newSlug}`, 
-    { 
-      execute : newSlug !== "" && newSlug.length >= MIN_SLUG_SIZE,
-    }
-  );
+  const parsedData = useParser(values.content || "");
+
+  const { data, isLoading } = useFetch<CodeChekResponse>(`${baseURL}/code_check.php?slug=${newSlug}`, {
+    execute: newSlug !== "" && newSlug.length >= MIN_SLUG_SIZE,
+  });
 
   useEffect(() => {
     let error = "";
 
-    if(values.slug != randomSlug) setAutoSlug(false);
+    if (values.slug != randomSlug) setAutoSlug(false);
 
-    if(values.slug && !/^[a-zA-Z0-9_-]*$/.test(values.slug)) {
+    if (values.slug && !/^[a-zA-Z0-9_-]*$/.test(values.slug)) {
       error = "Slug can only contain letters, numbers, - and _";
-    }
-    else if(values.slug && values.slug.length < MIN_SLUG_SIZE) {
+    } else if (values.slug && values.slug.length < MIN_SLUG_SIZE) {
       error = "Slug must be at least 3 characters long";
-    } 
-    else if(newSlug == values.slug && data && data.size !== 0) {
+    } else if (newSlug == values.slug && data && data.size !== 0) {
       error = "Slug is already taken";
     }
 
     setValidationError("slug", error);
-  }, [data, values.slug])
+  }, [data, values.slug]);
 
   const createRandomSlug = () => {
-    let slug = '';
+    let slug = "";
     for (let i = 0; i < RAND_SLUG_SIZE; i++) {
       const randomIndex = Math.floor(Math.random() * characters.length);
       slug += characters[randomIndex];
     }
     return slug;
-  }
+  };
 
   useEffect(() => {
-    if(autoSlug){
+    if (autoSlug) {
       const newRandomSlug = createRandomSlug();
       setRandomSlug(newRandomSlug);
       setValue("slug", newRandomSlug);
     }
-  }, [autoSlug])
+  }, [autoSlug]);
 
   useEffect(() => {
-    if(slug) {
+    if (slug) {
       setValue("slug", slug);
-    }
-    else {
+    } else {
       setAutoSlug(true);
     }
-  }, [slug])
+  }, [slug]);
 
   return (
     <Form
       isLoading={isLoading}
-      searchBarAccessory={
-        <Form.LinkAccessory
-          text="Help"
-          target="https://sharemycode.fr/help"
-        />
-      }
+      searchBarAccessory={<Form.LinkAccessory text="Help" target="https://sharemycode.fr/help" />}
       actions={
         <ActionPanel>
-            <Action.SubmitForm title="Submit" onSubmit={handleSubmit} icon={Icon.Upload} />
+          <Action.SubmitForm title="Submit" onSubmit={handleSubmit} icon={Icon.Upload} />
         </ActionPanel>
       }
     >
-      <Form.Checkbox 
+      <Form.Checkbox
         id="auto-slug"
         title="Auto-Slug"
         label="Generate a random slug"
         value={autoSlug}
         onChange={setAutoSlug}
       />
-      <Form.TextField 
-        title="Slug" 
-        placeholder="theSlugYouWant" 
+      <Form.TextField
+        title="Slug"
+        placeholder="theSlugYouWant"
         info="The slug is the part of the URL that comes after sharemycode.fr/"
-        {...itemProps.slug} 
-        onBlur={()=>{setNewSlug(values.slug)}} 
+        {...itemProps.slug}
+        onBlur={() => {
+          setNewSlug(values.slug);
+        }}
       />
-      <Form.TextArea 
-        title="Content" 
+      <Form.TextArea
+        title="Content"
         autoFocus
-        placeholder="Enter the text you want to share here" 
-        {...itemProps.content} 
+        placeholder="Enter the text you want to share here"
+        {...itemProps.content}
       />
     </Form>
   );

@@ -5,16 +5,14 @@ import useParser from "./hooks/useParser";
 import CodeView from "./components/CodeView";
 
 interface LaunchPropsType {
-    slug: string;
+  slug: string;
 }
 
-export default function GetCommand(props: LaunchProps<{arguments: LaunchPropsType} >) {
-    const { slug } = props.arguments;
-    const {data, isLoading} = useFetch<{code:string}>(`${baseURL}/code_get.php?slug=${slug}`)
-    
-    const parsedData = useParser(data?.code || "")
+export default function GetCommand(props: LaunchProps<{ arguments: LaunchPropsType }>) {
+  const { slug } = props.arguments;
+  const { data, isLoading } = useFetch<{ code: string }>(`${baseURL}/code_get.php?slug=${slug}`);
 
-    return (
-        <CodeView code={{code: data?.code || "", parsedCode : parsedData}} slug={slug} isLoading={isLoading}/>
-    );
+  const parsedData = useParser(data?.code || "");
+
+  return <CodeView code={{ code: data?.code || "", parsedCode: parsedData }} slug={slug} isLoading={isLoading} />;
 }
