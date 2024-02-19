@@ -7,7 +7,9 @@ export default function RecentCommand() {
   const { recents, deleteRecent, clearRecents } = useStoredRecents();
 
   return (
-    <List navigationTitle="Recent code shared">
+    <List 
+      navigationTitle="Recent code shared"
+    >
       {recents.length === 0 ? (
         <List.EmptyView icon={Icon.Code} title="You haven't created any ShareMyCode (yet!)" />
       ) : (
@@ -22,7 +24,7 @@ export default function RecentCommand() {
               subtitle={
                 recent.content.length > 25 ? recent.content.replace("\n", "").substring(0, 50) + "..." : recent.content
               }
-              icon={{ source: "smc.svg" }}
+              icon={{ source: "smc.svg", tintColor: Color.Yellow }}
               accessories={accessories}
               actions={
                 <ActionPanel title={`sharemycode.fr/${recent.slug}`}>

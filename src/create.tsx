@@ -7,16 +7,7 @@ import useStoredRecents from "./hooks/useStoredRecents";
 import flourite from "flourite";
 import CodeView from "./components/CodeView";
 import useParser from "./hooks/useParser";
-
-type CodeChekResponse = {
-  timestamp: number;
-  size: number;
-};
-
-interface SMCFormValues {
-  slug: string;
-  content: string;
-}
+import { SMCFormValues, CodeCheckResponse } from "./types";
 
 interface LaunchPropsType {
   slug: string;
@@ -54,7 +45,7 @@ export default function CreateCommand(props: LaunchProps<{ arguments: LaunchProp
 
         toast.style = Toast.Style.Success;
         toast.title = "Shared code!";
-        toast.message = `Copied ${smcUrl}/${values.slug} to your clipboard`;
+        toast.message = `Copied link to your clipboard`;
 
         const newStoredRecent = {
           slug: values.slug,
@@ -78,7 +69,7 @@ export default function CreateCommand(props: LaunchProps<{ arguments: LaunchProp
 
   const parsedData = useParser(values.content || "");
 
-  const { data, isLoading } = useFetch<CodeChekResponse>(`${baseURL}/code_check.php?slug=${newSlug}`, {
+  const { data, isLoading } = useFetch<CodeCheckResponse>(`${baseURL}/code_check.php?slug=${newSlug}`, {
     execute: newSlug !== "" && newSlug.length >= MIN_SLUG_SIZE,
   });
 
@@ -86,6 +77,10 @@ export default function CreateCommand(props: LaunchProps<{ arguments: LaunchProp
     let error = "";
 
     if (values.slug != randomSlug) setAutoSlug(false);
+
+    if(autoSlug && values.slug && data?.size === 0) {
+      createRandomSlug();
+    }
 
     if (values.slug && !/^[a-zA-Z0-9_-]*$/.test(values.slug)) {
       error = "Slug can only contain letters, numbers, - and _";
@@ -111,6 +106,7 @@ export default function CreateCommand(props: LaunchProps<{ arguments: LaunchProp
     if (autoSlug) {
       const newRandomSlug = createRandomSlug();
       setRandomSlug(newRandomSlug);
+      setNewSlug(newRandomSlug);
       setValue("slug", newRandomSlug);
     }
   }, [autoSlug]);
@@ -126,7 +122,7 @@ export default function CreateCommand(props: LaunchProps<{ arguments: LaunchProp
   return (
     <Form
       isLoading={isLoading}
-      searchBarAccessory={<Form.LinkAccessory text="Help" target="https://sharemycode.fr/help" />}
+      searchBarAccessory={<Form.LinkAccessory text="Help" target={smcUrl+"/help"} />}
       actions={
         <ActionPanel>
           <Action.SubmitForm title="Submit" onSubmit={handleSubmit} icon={Icon.Upload} />
