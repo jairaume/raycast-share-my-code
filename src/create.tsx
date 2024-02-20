@@ -163,10 +163,9 @@ export default function CreateCommand(props: LaunchProps<{ arguments: LaunchProp
         placeholder="Enter the text you want to share here"
         {...itemProps.content}
       />
-      {(detectedLanguage && detectedLanguage.language != "Unknown") && <Form.Description
-        title="Detected language"
-        text={detectedLanguage?.language || "Unknown"}
-      />}
+      {detectedLanguage && detectedLanguage.language != "Unknown" && (
+        <Form.Description title="Detected language" text={detectedLanguage?.language || "Unknown"} />
+      )}
     </Form>
   );
 }

@@ -15,7 +15,7 @@ export default function RecentCommand() {
   useEffect(() => {
     const languages = Array.from(
       new Set(recents.filter((recent) => recent.language !== "Unknown").map((recent) => recent.language)),
-    );
+    ).filter((language) => language !== undefined) as string[];
     setLanguages(languages);
   }, [recents]);
 
@@ -32,38 +32,43 @@ export default function RecentCommand() {
       navigationTitle="Recent code shared"
       isLoading={isLoading}
       searchBarPlaceholder="Search your recents"
-      searchBarAccessory={ languages && languages.length > 0 ?
-        <List.Dropdown 
-          tooltip="Select a content language" 
-          placeholder="Select a language" 
-          isLoading={isLoading} 
-          onChange={setSelectedLanguage} 
-          value={selectedLanguage}
-        >
-          <List.Dropdown.Item key="all" title="All" value="all" />
-          {languages?.map((language) => (
-            <List.Dropdown.Item
-              key={language}
-              title={language}
-              value={language}
-              icon={{ source: Icon.Code, tintColor: Color.Yellow }}
-            />
-          ))}
-        </List.Dropdown>
-        : undefined
+      searchBarAccessory={
+        languages && languages.length > 0 ? (
+          <List.Dropdown
+            tooltip="Select a content language"
+            placeholder="Select a language"
+            isLoading={isLoading}
+            onChange={setSelectedLanguage}
+            value={selectedLanguage}
+          >
+            <List.Dropdown.Item key="all" title="All" value="all" />
+            {languages?.map((language) => (
+              <List.Dropdown.Item
+                key={language}
+                title={language}
+                value={language}
+                icon={{ source: Icon.Code, tintColor: Color.Yellow }}
+              />
+            ))}
+          </List.Dropdown>
+        ) : undefined
       }
     >
       {filteredRecents.length === 0 ? (
-          <List.EmptyView 
-            icon={{ source: "smc.svg", tintColor: Color.Red }}
-            title="No recent code shared"
-            description={"You haven't created any ShareMyCode"+ (selectedLanguage!='all' ? (' in ' + selectedLanguage) : '') + " (yet!)"} 
-            actions={
-              <ActionPanel>
-                <CreateCodeAction slug="" />
-              </ActionPanel>
-            }
-          />
+        <List.EmptyView
+          icon={{ source: "smc.svg", tintColor: Color.Red }}
+          title="No recent code shared"
+          description={
+            "You haven't created any ShareMyCode" +
+            (selectedLanguage != "all" ? " in " + selectedLanguage : "") +
+            " (yet!)"
+          }
+          actions={
+            <ActionPanel>
+              <CreateCodeAction slug="" />
+            </ActionPanel>
+          }
+        />
       ) : (
         filteredRecents.map((recent) => {
           const accessories: object[] = [{ date: new Date(recent.date) }];
@@ -121,12 +126,5 @@ function RemoveRecentAction({ onDelete }: { onDelete: () => void }) {
 }
 
 function ClearRecentsAction({ onClear }: { onClear: () => void }) {
-  return (
-    <Action 
-      title="Clear All Recents" 
-      icon={Icon.Trash} 
-      style={Action.Style.Destructive} 
-      onAction={onClear} 
-    />
-  );
+  return <Action title="Clear All Recents" icon={Icon.Trash} style={Action.Style.Destructive} onAction={onClear} />;
 }
