@@ -36,7 +36,14 @@ export default function useStoredRecents() {
   }, []);
 
   const addRecent = (code: StoredCode) => {
-    const newRecents = [code, ...recents];
+    const existingIndex = recents.findIndex((r) => r.slug === code.slug);
+    let newRecents = [];
+    if (existingIndex !== -1) {
+      newRecents = [...recents];
+      newRecents[existingIndex] = code;
+    } else {
+      newRecents = [code, ...recents];
+    }
     setRecents(newRecents);
     LocalStorage.setItem("recents", JSON.stringify(newRecents));
   };

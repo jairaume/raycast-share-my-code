@@ -52,7 +52,7 @@ export default function CodeView(props: {
           <ActionPanel.Section title="Other">
             {checkRecent(slug) ? (
               <Action
-                title="Remove From Recent"
+                title="Remove From Recents"
                 icon={Icon.Minus}
                 style={Action.Style.Destructive}
                 shortcut={{ modifiers: ["cmd"], key: "r" }}
@@ -62,7 +62,7 @@ export default function CodeView(props: {
               />
             ) : (
               <Action
-                title="Add as Recent"
+                title="Add to Recents"
                 icon={Icon.Plus}
                 shortcut={{ modifiers: ["cmd"], key: "r" }}
                 onAction={() => {
