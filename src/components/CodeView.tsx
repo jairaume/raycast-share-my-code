@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import useStoredRecents from "../hooks/useStoredRecents";
 import CreateCodeAction from "./CreateCodeAction";
 import { smcUrl } from "../Constants";
+import RecentCommand from "../recent";
 
 export default function CodeView(props: {
   code: { code: string; parsedCode: string };
@@ -69,6 +70,12 @@ export default function CodeView(props: {
                 }}
               />
             )}
+            <Action.Push
+              title="View Recent ShareMyCodes"
+              icon={Icon.List}
+              shortcut={{ modifiers: ["cmd"], key: "h" }}
+              target={<RecentCommand />}
+            />
             <CreateCodeAction slug={slug} />
           </ActionPanel.Section>
         </ActionPanel>

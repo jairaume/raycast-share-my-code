@@ -13,23 +13,25 @@ export default function useStoredRecents() {
       setIsLoading(true);
       const storedRecents = await LocalStorage.getItem<string>("recents");
       let parsedRecents = storedRecents ? JSON.parse(storedRecents ?? "") : [];
-  
-      parsedRecents = await Promise.all(parsedRecents.map(async (recent: StoredCode) => {
-        const {body} = await got.post(`${baseURL}/code_check.php?slug=${recent.slug}`);
-        const parsedBody : CodeCheckResponse = JSON.parse(body);
-        if (parsedBody.size !== 0) {
-          return recent;
-        } 
-        return null; 
-      }));
-  
+
+      parsedRecents = await Promise.all(
+        parsedRecents.map(async (recent: StoredCode) => {
+          const { body } = await got.post(`${baseURL}/code_check.php?slug=${recent.slug}`);
+          const parsedBody: CodeCheckResponse = JSON.parse(body);
+          if (parsedBody.size !== 0) {
+            return recent;
+          }
+          return null;
+        }),
+      );
+
       parsedRecents = parsedRecents.filter((recent: StoredCode) => recent !== null);
-  
+
       setRecents(parsedRecents);
       await LocalStorage.setItem("recents", JSON.stringify(parsedRecents));
       setIsLoading(false);
     };
-  
+
     fetchRecents();
   }, []);
 
@@ -54,5 +56,5 @@ export default function useStoredRecents() {
     return recents.some((r) => r.slug === slug);
   };
 
-  return { recents, addRecent, clearRecents, deleteRecent, checkRecent, isLoading};
+  return { recents, addRecent, clearRecents, deleteRecent, checkRecent, isLoading };
 }

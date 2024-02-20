@@ -2,12 +2,39 @@ import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
 import ViewCodeAction from "./components/ViewCodeAction";
 import useStoredRecents from "./hooks/useStoredRecents";
 import { smcUrl } from "./Constants";
+import { useEffect, useState } from "react";
 
 export default function RecentCommand() {
   const { recents, deleteRecent, clearRecents, isLoading } = useStoredRecents();
 
+  const [languages, setLanguages] = useState<string[]>();
+
+  useEffect(() => {
+    const languages = Array.from(
+      new Set(recents.filter((recent) => recent.language !== "Unknown").map((recent) => recent.language)),
+    );
+    setLanguages(languages);
+  }, [recents]);
+
   return (
-    <List navigationTitle="Recent code shared" isLoading={isLoading}>
+    <List
+      navigationTitle="Recent code shared"
+      isLoading={isLoading}
+      searchBarPlaceholder="Search your recents"
+      searchBarAccessory={
+        <List.Dropdown tooltip="Select a content language" placeholder="Select a language" isLoading={isLoading}>
+          <List.Dropdown.Item key="all" title="All" value="all" />
+          {languages?.map((language) => (
+            <List.Dropdown.Item
+              key={language}
+              title={language}
+              value={language}
+              icon={{ source: Icon.Code, tintColor: Color.Yellow }}
+            />
+          ))}
+        </List.Dropdown>
+      }
+    >
       {recents.length === 0 ? (
         <List.EmptyView icon={Icon.Code} title="You haven't created any ShareMyCode (yet!)" />
       ) : (
