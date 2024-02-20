@@ -78,7 +78,7 @@ export default function CreateCommand(props: LaunchProps<{ arguments: LaunchProp
 
     if (values.slug != randomSlug) setAutoSlug(false);
 
-    if(autoSlug && values.slug && data?.size === 0) {
+    if (autoSlug && values.slug && data?.size === 0) {
       createRandomSlug();
     }
 
@@ -122,7 +122,7 @@ export default function CreateCommand(props: LaunchProps<{ arguments: LaunchProp
   return (
     <Form
       isLoading={isLoading}
-      searchBarAccessory={<Form.LinkAccessory text="Help" target={smcUrl+"/help"} />}
+      searchBarAccessory={<Form.LinkAccessory text="Help" target={smcUrl + "/help"} />}
       actions={
         <ActionPanel>
           <Action.SubmitForm title="Submit" onSubmit={handleSubmit} icon={Icon.Upload} />

@@ -4,12 +4,10 @@ import useStoredRecents from "./hooks/useStoredRecents";
 import { smcUrl } from "./Constants";
 
 export default function RecentCommand() {
-  const { recents, deleteRecent, clearRecents } = useStoredRecents();
+  const { recents, deleteRecent, clearRecents, isLoading } = useStoredRecents();
 
   return (
-    <List 
-      navigationTitle="Recent code shared"
-    >
+    <List navigationTitle="Recent code shared" isLoading={isLoading}>
       {recents.length === 0 ? (
         <List.EmptyView icon={Icon.Code} title="You haven't created any ShareMyCode (yet!)" />
       ) : (
@@ -31,6 +29,7 @@ export default function RecentCommand() {
                   <ActionPanel.Section>
                     <ViewCodeAction slug={recent.slug} />
                     <Action.OpenInBrowser title="Open in Browser" url={`${smcUrl}/${recent.slug}`} />
+                    <Action.CopyToClipboard title="Copy URL" content={`${smcUrl}/${recent.slug}`} icon={Icon.Link} />
                     <Action.CopyToClipboard title="Copy Content" content={recent.content} />
                   </ActionPanel.Section>
                   <ActionPanel.Section title="Manage recents">
