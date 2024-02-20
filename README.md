@@ -12,17 +12,17 @@
 > ⚠️ This will only work if you are working on a Mac with [Raycast](https://raycast.com) installed.
 ### Install dependencies
 ```bash
-yarn
+npm i
 ```
 
 ### Development
 ```bash
-yarn dev
+npm run dev
 ```
 
 ### Building
 ```bash
-yarn build
+npm run build
 ```
 
 ## Author
