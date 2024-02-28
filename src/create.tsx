@@ -1,4 +1,16 @@
-import { Action, ActionPanel, Form, Toast, showToast, Clipboard, LaunchProps, Icon, popToRoot, useNavigation, getPreferenceValues } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Form,
+  Toast,
+  showToast,
+  Clipboard,
+  LaunchProps,
+  Icon,
+  popToRoot,
+  useNavigation,
+  getPreferenceValues,
+} from "@raycast/api";
 import { FormValidation, useForm, useFetch } from "@raycast/utils";
 import { useEffect, useState } from "react";
 import got from "got";
@@ -59,10 +71,11 @@ export default function CreateCommand(props: LaunchProps<{ arguments: LaunchProp
         };
         addRecent(newStoredRecent);
 
-        if(preferences.openAfterCreation) 
-          push(<CodeView code={{ code: values.content, parsedCode: parsedData }} slug={values.slug} isLoading={false} />);
-        else 
-          popToRoot();
+        if (preferences.openAfterCreation)
+          push(
+            <CodeView code={{ code: values.content, parsedCode: parsedData }} slug={values.slug} isLoading={false} />,
+          );
+        else popToRoot();
       } catch (error) {
         console.error(error);
         toast.style = Toast.Style.Failure;
